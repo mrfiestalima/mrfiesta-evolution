@@ -1,9 +1,12 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowUpRight, ChevronDown, Instagram, Menu, MoveUpRight, Play, Sparkles, X, Zap } from 'lucide-react'
 import { messages, whatsappUrl } from './lib/whatsapp'
 import { mediaManifest } from './data/media'
 import { MediaVideo } from './components/MediaVideo'
+import { fallbackCelebrations } from './data/celebrations'
+import { getPublishedCelebrations } from './data/celebrationsRepository'
+import type { Celebration } from './types/celebrations'
 
 const experiences = [
   { number: '01', name: 'Chicoteca en Casa', price: 'S/750', time: '2 horas', desc: 'El primer salto: música, luces y una pista que convierte tu sala en el centro de todo.', tags: ['DJ', 'Luces', 'Juegos'] },
@@ -14,11 +17,7 @@ const experiences = [
 const tech = [
   ['Pista LED Infinity', '01', 'tech-wide'], ['ILUMINACIÓN\nINTELIGENTE', '02', 'tech-tall'], ['JUST DANCE', '03', 'tech-small'], ['KARAOKE', '04', 'tech-small'], ['PROYECCIÓN\nAUDIOVISUAL', '05', 'tech-wide'], ['ROBOT LED', '06', 'tech-small'], ['GLITTER & NEON', '07', 'tech-tall']
 ]
-const events = [
-  { name: 'Valentina cumple 15', meta: 'La Molina · Fiesta editorial', color: 'violet', tags: ['Quinceañera', 'LED'] },
-  { name: 'Mateo cumple 10', meta: 'Surco · Una tarde fuera de serie', color: 'cyan', tags: ['Cumpleaños', 'Just Dance'] },
-  { name: 'Prom 2025', meta: 'Lima · El último baile', color: 'pink', tags: ['Prom', 'Live'] }
-]
+const eventColors = ['violet', 'cyan', 'pink'] as const
 
 function Reveal({ children, delay = 0, className = '' }: { children: ReactNode; delay?: number; className?: string }) {
   const reduced = useReducedMotion()
@@ -28,6 +27,14 @@ function Reveal({ children, delay = 0, className = '' }: { children: ReactNode; 
 function App() {
   const [menu, setMenu] = useState(false)
   const [activeExperience, setActiveExperience] = useState(1)
+  const [celebrations, setCelebrations] = useState<Celebration[]>(fallbackCelebrations)
+  useEffect(() => {
+    let mounted = true
+    getPublishedCelebrations().then((published) => {
+      if (mounted && published.length > 0) setCelebrations(published)
+    })
+    return () => { mounted = false }
+  }, [])
   const nav = ['Inicio', 'Experiencias', 'Tecnología', 'Eventos', 'MR Fiesta Live']
   return <div className="site-shell">
     <header className="nav-wrap"><nav className="nav container"><a href="#inicio" className="brand" aria-label="MR Fiesta inicio"><span>MR</span> FIESTA</a><div className={`nav-links ${menu ? 'is-open' : ''}`}>{nav.map((item, i) => <a key={item} href={['#inicio','#experiencias','#tecnologia','#eventos','#live'][i]} onClick={() => setMenu(false)}>{item}</a>)}<a className="nav-cta" href={whatsappUrl(messages.quote)}>Cotizar <ArrowUpRight size={15}/></a></div><button className="menu-toggle" aria-label={menu ? 'Cerrar menú' : 'Abrir menú'} onClick={() => setMenu(!menu)}>{menu ? <X/> : <Menu/>}</button></nav></header>
@@ -43,7 +50,7 @@ function App() {
 
       <section className="live section" id="live"><div className="container live-panel"><div className="live-copy"><p className="eyebrow">05 / MR FIESTA LIVE</p><h2>LA FIESTA<br/><em>TAMBIÉN SE<br/>CONECTA.</em></h2><p>Una capa digital que convierte a los invitados en parte activa del show. Piden canciones, comparten fotos, reaccionan y se conectan con el DJ.</p><a className="text-link yellow-link" href={whatsappUrl('Hola 👋 Quiero conocer MR Fiesta Live para mi evento.')}>Conocer MR Fiesta Live <ArrowUpRight size={16}/></a></div><div className="live-interface"><div className="live-top"><span><span className="status-dot"/> MR FIESTA LIVE</span><span>08:42 PM</span></div><div className="live-screen"><div className="qr"><div className="qr-core"/><span>SCAN TO JOIN</span></div><div className="live-actions"><div><span className="live-icon">♫</span><b>Pedidos en vivo</b><small>Conecta con el DJ</small></div><div><span className="live-icon">♡</span><b>Reacciones</b><small>Hazlo sentir</small></div><div><span className="live-icon">▧</span><b>Galería</b><small>Comparte la noche</small></div></div></div></div></div></section>
 
-      <section className="events section" id="eventos"><div className="container"><Reveal><div className="section-top"><div><p className="eyebrow">06 / CELEBRACIONES REALES</p><h2>ESTO YA PASÓ.<br/><em>EL PRÓXIMO PUEDE<br/>SER EL TUYO.</em></h2></div><p className="section-note wide-note">Historias que ya tienen música,<br/>luz y gente dentro.</p></div></Reveal><div className="event-grid">{events.map((event, i) => <Reveal key={event.name} delay={i * .1} className={`event-card ${event.color}`}><div className="event-art"><span>{String(i+1).padStart(2,'0')}</span><div className="event-light"/><div className="event-placeholder">MEDIA<br/>PREVIEW</div><button aria-label={`Reproducir video de ${event.name}`}><Play size={15} fill="currentColor"/></button></div><div className="event-details"><p>{event.meta}</p><h3>{event.name}</h3><div>{event.tags.map(tag => <span key={tag}>{tag}</span>)}</div><a href={whatsappUrl(messages.event(event.name))}>Ver cómo se vivió <ArrowUpRight size={15}/></a></div></Reveal>)}</div></div></section>
+      <section className="events section" id="eventos"><div className="container"><Reveal><div className="section-top"><div><p className="eyebrow">06 / CELEBRACIONES REALES</p><h2>ESTO YA PASÓ.<br/><em>EL PRÓXIMO PUEDE<br/>SER EL TUYO.</em></h2></div><p className="section-note wide-note">Historias que ya tienen música,<br/>luz y gente dentro.</p></div></Reveal><div className="event-grid">{celebrations.map((event, i) => <Reveal key={event.id} delay={i * .1} className={`event-card ${eventColors[i % eventColors.length]}`}><div className="event-art"><span>{String(i+1).padStart(2,'0')}</span><div className="event-light"/>{event.coverUrl ? <img src={event.coverUrl} alt="" loading="lazy"/> : <div className="event-placeholder">MEDIA<br/>PREVIEW</div>}<button aria-label={`Reproducir video de ${event.title}`}><Play size={15} fill="currentColor"/></button></div><div className="event-details"><p>{event.meta}</p><h3>{event.title}</h3><div>{event.tags.map(tag => <span key={tag}>{tag}</span>)}</div><a href={whatsappUrl(messages.event(event.title))}>Ver cómo se vivió <ArrowUpRight size={15}/></a></div></Reveal>)}</div></div></section>
 
       <section className="proof section container"><Reveal><div className="proof-quote">“No fue una animación.<br/><em>Fue el momento del que<br/>todos siguen hablando.</em>”</div><div className="proof-by"><span className="line"/> <span>TESTIMONIO / PLACEHOLDER REEMPLAZABLE</span></div></Reveal></section>
       <section className="facts section"><div className="container"><Reveal><p className="eyebrow">WHY MR FIESTA / EN HECHOS</p><div className="facts-grid"><div><strong>01</strong><h3>Producción<br/><em>propia.</em></h3><p>Diseñamos y operamos cada experiencia desde dentro.</p></div><div><strong>02</strong><h3>Equipos<br/><em>propios.</em></h3><p>Control real sobre cada detalle que se enciende.</p></div><div><strong>03</strong><h3>Tecnología<br/><em>propia.</em></h3><p>Herramientas que nacen para hacerte vivir más.</p></div><div><strong>04</strong><h3>Para cada<br/><em>edad.</em></h3><p>Niños, preadolescentes, adolescentes y quinceañeros.</p></div></div></Reveal></div></section>
