@@ -4,7 +4,7 @@ import { getSignedUrl } from 'npm:@aws-sdk/s3-request-presigner@3.859.0'
 
 const corsHeaders = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type', 'Access-Control-Allow-Methods': 'POST, OPTIONS' }
 const imageTypes: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }
-const videoTypes: Record<string, string> = { 'video/mp4': 'mp4' }
+const videoTypes: Record<string, string> = { 'video/mp4': 'mp4', 'video/webm': 'webm' }
 const maxImageBytes = 20 * 1024 * 1024
 const maxVideoBytes = 500 * 1024 * 1024
 

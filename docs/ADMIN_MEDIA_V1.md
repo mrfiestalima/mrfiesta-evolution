@@ -30,7 +30,7 @@ En Cloudflare Dashboard → R2 → Overview → Manage R2 API Tokens → Create 
 
 ## Flujo y límites
 
-Se aceptan JPEG, PNG, WebP y MP4. Imágenes: 20 MB. Video: 500 MB; sobre 150 MB se muestra una advertencia. La subida usa XMLHttpRequest para progreso real y máximo tres archivos simultáneos. Si la inserción de metadata falla, se intenta limpiar el objeto mediante la misma Edge Function.
+Se aceptan JPEG, PNG, WebP, MP4 y WebM. Imágenes: 20 MB. Video: 500 MB; sobre 150 MB se muestra una advertencia. La subida usa XMLHttpRequest para progreso real y máximo tres archivos simultáneos. Si la inserción de metadata falla, se intenta limpiar el objeto mediante la misma Edge Function.
 
 ## Portada, trailer y orden
 
