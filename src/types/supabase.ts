@@ -3,6 +3,12 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      admin_users: {
+        Row: { user_id: string; created_at: string }
+        Insert: { user_id: string; created_at?: string }
+        Update: Partial<Database['public']['Tables']['admin_users']['Insert']>
+        Relationships: []
+      }
       celebrations: {
         Row: {
           id: string
