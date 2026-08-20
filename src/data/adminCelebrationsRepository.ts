@@ -6,7 +6,7 @@ import type { Database } from '../types/supabase'
 
 type CelebrationInsert = Database['public']['Tables']['celebrations']['Insert']
 
-export type CelebrationInput = Omit<CelebrationInsert, 'id' | 'created_at' | 'updated_at' | 'published' | 'featured'> & { featured: boolean }
+export type CelebrationInput = Omit<CelebrationInsert, 'id' | 'created_at' | 'updated_at' | 'published' | 'featured' | 'cover_url' | 'trailer_url'> & { featured: boolean }
 
 function requireSupabase() {
   if (!supabase) throw new Error('Supabase no está configurado.')
