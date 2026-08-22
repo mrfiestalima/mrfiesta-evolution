@@ -18,3 +18,19 @@
 @keyframes control-breathe-whatsapp{0%,100%{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 8px rgba(var(--control-green-rgb),.14)}50%{box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 14px rgba(var(--control-green-rgb),.24),0 0 30px rgba(var(--control-green-rgb),.12)}}
 @media(max-width:800px){.button-primary{min-height:48px}.tag-row a.button-primary{width:100%;margin:10px 0 0}.whatsapp-float{animation-duration:3.8s}.button-breathe{animation-duration:3.6s}.celebration-whatsapp-cta{animation-duration:3.8s}}
 @media(prefers-reduced-motion:reduce){.button-breathe,.celebration-whatsapp-cta,.whatsapp-float{animation:none}.button-primary,.explore-link,.whatsapp-float a{transition:none}.button-primary:hover,.explore-link:hover,.whatsapp-float a:hover{transform:none}.button-primary:active{transform:none}}
+
+/* The compact card CTA shares the floating contact-panel language. */
+.celebration-whatsapp-cta--compact,.event-details>.event-ctas a.celebration-whatsapp-cta--compact{background:linear-gradient(120deg,#101519 0%,#0b0f12 100%);border:1px solid rgba(var(--control-green-rgb),.82);color:#f5f7f6;box-shadow:inset 0 1px 0 rgba(255,255,255,.09),inset 0 0 0 1px rgba(var(--control-green-rgb),.12),0 0 12px rgba(var(--control-green-rgb),.12)}
+.celebration-whatsapp-cta--compact:before{content:'WHATSAPP / DIRECT';top:5px;right:38px;color:rgba(170,235,190,.62)}
+.celebration-whatsapp-cta--compact:after{border-color:rgba(var(--control-green-rgb),.16)}
+.celebration-whatsapp-cta--compact .whatsapp-mark{background:rgba(var(--control-green-rgb),.15);border-color:rgba(var(--control-green-rgb),.62);color:var(--control-green);box-shadow:0 0 10px rgba(var(--control-green-rgb),.2)}
+.event-details>.event-ctas a.celebration-whatsapp-cta--compact .whatsapp-cta-copy strong,.celebration-whatsapp-cta--compact .whatsapp-cta-copy strong{color:#f5f7f6}
+.celebration-whatsapp-cta--compact .whatsapp-cta-copy small{color:#9ed5ad}
+.celebration-whatsapp-cta--compact .whatsapp-cta-arrow{color:#7df2a2}
+.celebration-whatsapp-cta--compact:hover{background:linear-gradient(120deg,#121c18 0%,#0b1110 100%);border-color:var(--control-green);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 0 0 1px rgba(var(--control-green-rgb),.2),0 0 22px rgba(var(--control-green-rgb),.23);color:#fff}
+.celebration-whatsapp-cta--compact:hover .whatsapp-mark{background:rgba(var(--control-green-rgb),.28);color:#6dffa0;box-shadow:0 0 16px rgba(var(--control-green-rgb),.4)}
+.celebration-whatsapp-cta--compact:hover .whatsapp-cta-arrow{transform:translate(2px,-2px)}
+.nav-cta{background:linear-gradient(112deg,var(--control-violet),var(--control-blue) 52%,var(--control-primary-cyan))!important;color:#061017!important;border:1px solid rgba(122,228,255,.72);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 0 12px rgba(34,211,238,.12);transition:box-shadow .22s,transform .22s}.nav-cta:hover{box-shadow:0 0 18px rgba(34,211,238,.25);transform:translateY(-1px)}
+@media(min-width:801px){.button-breathe,.celebration-whatsapp-cta,.whatsapp-float{animation:none}.button-breathe:hover,.button-breathe:focus-visible,.celebration-whatsapp-cta:hover,.celebration-whatsapp-cta:focus-visible,.whatsapp-float:hover{animation:control-breathe-primary 3.2s ease-in-out infinite}.celebration-whatsapp-cta:hover,.celebration-whatsapp-cta:focus-visible,.whatsapp-float:hover{animation-name:control-breathe-whatsapp}}
+@media(max-width:800px){.button-breathe,.celebration-whatsapp-cta,.whatsapp-float{animation:control-breathe-primary 3.6s ease-in-out infinite}.celebration-whatsapp-cta,.whatsapp-float{animation-name:control-breathe-whatsapp}}
+@media(prefers-reduced-motion:reduce){.button-breathe,.celebration-whatsapp-cta,.whatsapp-float{animation:none}.nav-cta{transition:none}.nav-cta:hover{transform:none}}
