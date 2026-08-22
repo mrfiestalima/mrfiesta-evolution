@@ -51,3 +51,8 @@
 @media(max-width:800px){.event-details>.event-ctas .event-explore-button{animation:control-breathe-explore 3.6s ease-in-out infinite}.event-details>.event-ctas .celebration-whatsapp-cta--compact{animation:control-breathe-whatsapp 3.8s ease-in-out infinite}}
 @keyframes control-breathe-explore{0%,100%{box-shadow:inset 0 1px 0 rgba(255,255,255,.42),0 0 10px rgba(var(--control-cyan-rgb),.18),0 0 24px rgba(var(--control-cyan-rgb),.08)}50%{box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 0 17px rgba(var(--control-cyan-rgb),.3),0 0 34px rgba(var(--control-cyan-rgb),.14)}}
 @media(prefers-reduced-motion:reduce){.event-details>.event-ctas .event-explore-button,.event-details>.event-ctas .celebration-whatsapp-cta--compact{animation:none}.event-details>.event-ctas .event-explore-button:hover,.event-details>.event-ctas .celebration-whatsapp-cta--compact:hover{transform:none}}
+.event-details>.event-ctas .event-explore-button svg{width:18px;height:18px;filter:drop-shadow(0 0 5px rgba(var(--control-cyan-rgb),.55))}
+.event-details>.event-ctas .event-explore-button span{font-size:11px;font-weight:700;letter-spacing:.055em}
+.event-details>.event-ctas .celebration-whatsapp-cta--compact .whatsapp-mark svg{width:20px;height:20px;filter:drop-shadow(0 0 5px rgba(var(--control-green-rgb),.55))}
+.event-details>.event-ctas .celebration-whatsapp-cta--compact .whatsapp-cta-copy strong{font-size:11px;font-weight:800;letter-spacing:.045em;line-height:1.2}
+.event-details>.event-ctas .celebration-whatsapp-cta--compact .whatsapp-cta-copy small{font-size:8px;letter-spacing:.1em}
