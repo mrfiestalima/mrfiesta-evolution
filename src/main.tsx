@@ -5,5 +5,6 @@ import './index.css'
 import './media.css'
 import './event-media.css'
 import './celebration-modal.css'
+import './controls.css'
 
 createRoot(document.getElementById('root')!).render(<StrictMode><App /></StrictMode>)
