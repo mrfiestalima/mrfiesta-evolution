@@ -25,11 +25,18 @@
 .celebration-whatsapp-cta:hover{box-shadow:0 10px 25px rgba(234,255,84,.2),inset 0 1px 0 #fff;transform:translateY(-2px)}
 .celebration-whatsapp-cta:hover .whatsapp-mark{background:#25d366;color:#063f22;box-shadow:0 0 12px rgba(37,211,102,.42)}
 .celebration-whatsapp-cta:hover .whatsapp-cta-arrow{transform:translate(2px,-2px)}
-.celebration-whatsapp-cta--full{min-height:58px;padding:11px 14px}
-.celebration-whatsapp-cta--full .whatsapp-cta-copy strong{font-size:11px}
-.celebration-whatsapp-cta--full .whatsapp-cta-copy small{font-size:9px}
+.celebration-whatsapp-cta--modal{min-height:58px;padding:11px 14px;background:linear-gradient(120deg,#101519 0%,#0b0f12 100%);border:1px solid rgba(37,211,102,.82);color:#f5f7f6;box-shadow:inset 0 1px 0 rgba(255,255,255,.09),inset 0 0 0 1px rgba(37,211,102,.12),0 0 18px rgba(37,211,102,.14)}
+.celebration-whatsapp-cta--modal:before{content:'WHATSAPP / DIRECT';top:5px;right:39px;color:rgba(170,235,190,.62)}
+.celebration-whatsapp-cta--modal:after{border-color:rgba(37,211,102,.16)}
+.celebration-whatsapp-cta--modal .whatsapp-mark{background:rgba(37,211,102,.15);border-color:rgba(37,211,102,.62);color:#25d366;box-shadow:0 0 12px rgba(37,211,102,.22)}
+.celebration-whatsapp-cta--modal .whatsapp-cta-copy strong{font-size:11px;color:#f5f7f6}
+.celebration-whatsapp-cta--modal .whatsapp-cta-copy small{font-size:9px;color:#9ed5ad}
+.celebration-whatsapp-cta--modal .whatsapp-cta-arrow{color:#7df2a2}
+.celebration-whatsapp-cta--modal:hover{background:linear-gradient(120deg,#121c18 0%,#0b1110 100%);border-color:#25d366;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 0 0 1px rgba(37,211,102,.2),0 0 25px rgba(37,211,102,.25);color:#fff}
+.celebration-whatsapp-cta--modal:hover .whatsapp-mark{background:rgba(37,211,102,.28);color:#6dffa0;box-shadow:0 0 18px rgba(37,211,102,.42)}
+.celebration-whatsapp-cta--modal:hover .whatsapp-cta-arrow{transform:translate(2px,-2px)}
 .modal-copy .celebration-whatsapp-cta{max-width:290px;margin-top:30px}
-.modal-copy .celebration-whatsapp-cta:before{display:none}
+.modal-copy .celebration-whatsapp-cta:before{display:block}
 .event-explore-button:focus-visible,.celebration-whatsapp-cta:focus-visible{outline:2px solid #45e7ff;outline-offset:3px}
-@media(max-width:800px){.event-ctas{grid-template-columns:minmax(0,1fr)}.event-explore-button,.celebration-whatsapp-cta{min-height:48px}.celebration-whatsapp-cta--full{min-height:60px}.modal-copy .celebration-whatsapp-cta{max-width:none}}
+@media(max-width:800px){.event-ctas{grid-template-columns:minmax(0,1fr)}.event-explore-button,.celebration-whatsapp-cta{min-height:48px}.celebration-whatsapp-cta--modal{min-height:60px}.modal-copy .celebration-whatsapp-cta{max-width:none}}
 @media(prefers-reduced-motion:reduce){.event-explore-button,.celebration-whatsapp-cta,.event-explore-button svg,.whatsapp-mark,.whatsapp-cta-arrow{transition:none}.event-explore-button:hover,.celebration-whatsapp-cta:hover{transform:none}.event-explore-button:hover svg,.celebration-whatsapp-cta:hover .whatsapp-cta-arrow{transform:none}}
