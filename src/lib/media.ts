@@ -1,4 +1,4 @@
-const mediaBaseUrl = (import.meta.env.VITE_MEDIA_BASE_URL as string | undefined)?.trim().replace(/\/+$/, '')
+const mediaBaseUrl = (import.meta.env?.VITE_MEDIA_BASE_URL as string | undefined)?.trim().replace(/\/+$/, '')
 
 export const MEDIA_BASE_URL = mediaBaseUrl
 
