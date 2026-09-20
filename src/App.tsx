@@ -126,7 +126,7 @@ function App() {
         <header className="nav-wrap">
           <nav className="nav container">
             <a href="#inicio" className="brand" aria-label="MR Fiesta inicio">
-              <span>MR</span> FIESTA
+              <img className="brand-logo" src={`${import.meta.env.BASE_URL}logo.png`} alt="MR Fiesta" width="918" height="533" />
             </a>
             <div
               id="main-navigation"
@@ -620,7 +620,7 @@ function App() {
           <div className="container footer-inner">
             <div>
               <a href="#inicio" className="brand">
-                <span>MR</span> FIESTA
+                <img className="brand-logo" src={`${import.meta.env.BASE_URL}logo.png`} alt="MR Fiesta" width="918" height="533" loading="lazy" />
               </a>
               <p>{copy.footerDescription}</p>
             </div>

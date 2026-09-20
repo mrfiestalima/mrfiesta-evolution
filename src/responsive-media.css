@@ -1,4 +1,7 @@
 /* Portrait originals keep their complete composition on every screen. */
+.brand-logo { display: block; width: 110px; height: auto; object-fit: contain; }
+.footer .brand-logo { width: 180px; }
+@media (max-width: 800px) { .nav .brand-logo { width: 94px; } }
 .site-asset,
 .event-art img,
 .event-art video,
