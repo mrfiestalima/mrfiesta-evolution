@@ -7,5 +7,6 @@ import './event-media.css'
 import './celebration-modal.css'
 import './controls.css'
 import './commercial.css'
+import './responsive-media.css'
 
 createRoot(document.getElementById('root')!).render(<StrictMode><App /></StrictMode>)
