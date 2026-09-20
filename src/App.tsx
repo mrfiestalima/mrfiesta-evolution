@@ -200,7 +200,7 @@ function App() {
                 </div>
                 <div
                   className="hero-media"
-                  aria-label="Video ambiental de MR Fiesta"
+                  aria-label="Foto o video de MR Fiesta"
                 >
                   <div className="media-video">
                     <div className="media-noise" />

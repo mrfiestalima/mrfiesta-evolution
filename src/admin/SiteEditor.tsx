@@ -390,6 +390,11 @@ export default function SiteEditor({ demo = false }: { demo?: boolean }) {
         </button>
       </div>
       <p className="cms-help">
+        Recomendado: fotos y videos verticales de 1080 × 1920 px (9:16).
+        También puedes subir horizontales; se muestran completos, sin recortar.
+        Para video, usa MP4 con H.264 y audio AAC. No necesitas convertir tus
+        grabaciones verticales a horizontal. </p>
+      <p className="cms-help">
         JPG, PNG y WebP hasta 20 MB · MP4 y WebM hasta 500 MB. Los archivos se
         guardan en Cloudflare y quedan disponibles mediante su enlace. Solo
         aparecen en la página cuando los asignas a una sección y publicas.
