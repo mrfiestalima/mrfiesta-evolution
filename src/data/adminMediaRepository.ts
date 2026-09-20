@@ -13,7 +13,7 @@ export async function requestUploadUrl(celebrationId: string, file: File): Promi
 }
 
 export function uploadToR2(uploadUrl: string, file: File, onProgress: (progress: number) => void): Promise<void> {
-  return new Promise((resolve, reject) => { const xhr = new XMLHttpRequest(); xhr.open('PUT', uploadUrl); xhr.setRequestHeader('Content-Type', file.type); xhr.upload.onprogress = event => { if (event.lengthComputable) onProgress(Math.round((event.loaded / event.total) * 100)) }; xhr.onload = () => xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error('R2 upload failed')); xhr.onerror = () => reject(new Error('R2 upload failed')); xhr.onabort = () => reject(new Error('Upload cancelled')); xhr.send(file) })
+  return new Promise((resolve, reject) => { const xhr = new XMLHttpRequest(); xhr.open('PUT', uploadUrl); xhr.timeout = 900000; xhr.ontimeout = () => reject(new Error('La subida tardó demasiado. Revisa tu conexión e inténtalo de nuevo.')); xhr.setRequestHeader('Content-Type', file.type); xhr.upload.onprogress = event => { if (event.lengthComputable) onProgress(Math.round((event.loaded / event.total) * 100)) }; xhr.onload = () => xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error('R2 upload failed')); xhr.onerror = () => reject(new Error('R2 upload failed')); xhr.onabort = () => reject(new Error('Upload cancelled')); xhr.send(file) })
 }
 
 export async function insertMedia(celebrationId: string, asset: PresignResponse, file: File, sortOrder: number): Promise<CelebrationMedia> {
@@ -24,7 +24,17 @@ export async function insertMedia(celebrationId: string, asset: PresignResponse,
 }
 
 export async function cleanupObject(celebrationId: string, key: string): Promise<void> { const client = requireSupabase(); const { error } = await client.functions.invoke('r2-media', { body: { operation: 'cleanup-object', celebrationId, key } }); if (error) throw new Error(error.message) }
-export async function deleteMedia(mediaId: string): Promise<void> { const client = requireSupabase(); const { error } = await client.functions.invoke('r2-media', { body: { operation: 'delete-media', mediaId } }); if (error) throw new Error(error.message) }
+export async function deleteMedia(mediaId: string): Promise<void> {
+  const client = requireSupabase()
+  const [media, documents] = await Promise.all([
+    client.from('media').select('url').eq('id',mediaId).single(),
+    client.from('site_documents').select('content'),
+  ])
+  if (media.error || documents.error) throw new Error('No se pudo comprobar si el archivo está en uso.')
+  if (documents.data?.some(doc=>JSON.stringify(doc.content).includes(media.data.url))) throw new Error('Este archivo está en uso en el contenido de la web. Retíralo del borrador y de la versión publicada antes de eliminarlo.')
+  const { error } = await client.functions.invoke('r2-media', { body: { operation: 'delete-media', mediaId } })
+  if (error) throw new Error(error.message)
+}
 export async function updateMediaOrder(mediaId: string, sortOrder: number): Promise<void> { const client = requireSupabase(); const { error } = await client.from('media').update({ sort_order: sortOrder }).eq('id', mediaId); if (error) throw new Error(error.message) }
 export async function setCelebrationCover(celebrationId: string, url: string): Promise<void> { const client = requireSupabase(); const { error } = await client.from('celebrations').update({ cover_url: url }).eq('id', celebrationId); if (error) throw new Error(error.message) }
 export async function setCelebrationTrailer(celebrationId: string, url: string): Promise<void> { const client = requireSupabase(); const { error } = await client.from('celebrations').update({ trailer_url: url }).eq('id', celebrationId); if (error) throw new Error(error.message) }
