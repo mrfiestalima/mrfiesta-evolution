@@ -1,0 +1,17 @@
+.hero:has(.hero-background){isolation:isolate;overflow:hidden;min-height:760px;height:100svh;max-height:1050px;background:#08090b}
+.hero-background{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:radial-gradient(ellipse at 77% 45%,#23152e 0,transparent 52%)}
+.hero-background video,.hero-background img{position:absolute;right:-7%;top:8%;width:76%;height:84%;object-fit:contain;mix-blend-mode:screen;mask-image:linear-gradient(to bottom,transparent,#000 12%,#000 85%,transparent);opacity:.94}
+.hero-background::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#08090b 0,rgba(8,9,11,.94) 22%,rgba(8,9,11,.55) 44%,transparent 68%),linear-gradient(0deg,#08090b,transparent 24%)}
+.hero:has(.hero-background) .hero-main{display:flex;align-items:center;position:relative;padding-bottom:55px}
+.hero:has(.hero-background) .hero-main>div{width:55%;max-width:650px}
+.hero:has(.hero-background) .hero-content{z-index:1}
+.hero:has(.hero-background) .hero-orbit{opacity:.35;pointer-events:none}
+.hero:has(.hero-background) .hero-copy{color:#c3c3ca}
+@media(max-width:800px){
+  .hero:has(.hero-background){height:auto;min-height:850px;max-height:none}
+  .hero-background video,.hero-background img{right:-16%;top:85px;width:125%;height:390px;opacity:.85}
+  .hero-background::after{background:linear-gradient(0deg,#08090b 6%,rgba(8,9,11,.94) 34%,rgba(8,9,11,.3) 64%,transparent 85%)}
+  .hero:has(.hero-background) .hero-content{padding-top:110px;padding-bottom:30px}
+  .hero:has(.hero-background) .hero-main{padding-top:240px;padding-bottom:50px}
+  .hero:has(.hero-background) .hero-main>div{width:100%;max-width:600px}
+}

@@ -1,3 +1,4 @@
+import { HeroBackground } from './components/HeroBackground';
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
@@ -161,6 +162,7 @@ function App() {
 
         <main id="contenido" tabIndex={-1}>
           <section className="hero" id="inicio">
+            <HeroBackground asset={content.heroAsset} />
             <div className="hero-orbit orbit-one" />
             <div className="hero-orbit orbit-two" />
             <div className="hero-grid" />
@@ -198,30 +200,7 @@ function App() {
                     </a>
                   </div>
                 </div>
-                <div
-                  className="hero-media"
-                  aria-label="Foto o video de MR Fiesta"
-                >
-                  <div className="media-video">
-                    <div className="media-noise" />
-                    <div className="media-center">
-                      <strong>
-                        DALE PLAY
-                        <br />A TU FIESTA.
-                      </strong>
-                      <span>MÚSICA · LUCES · MOMENTOS</span>
-                    </div>
-                  </div>
-                  <SiteAsset
-                    asset={content.heroAsset}
-                    alt="MR Fiesta en acción"
-                    ambient={!reducedMotion}
-                  />
-                  <div className="media-caption">
-                    <span>MÚSICA QUE CONECTA</span>
-                    <span>LIMA, PERÚ</span>
-                  </div>
-                </div>
+
               </div>
               <div className="hero-bottom">
                 <span>SCROLL TO EXPLORE</span>
