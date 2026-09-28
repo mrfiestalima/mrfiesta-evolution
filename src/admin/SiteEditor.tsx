@@ -7,6 +7,7 @@ import {
   Save,
   Upload,
   X,
+  Trash2,
 } from "lucide-react";
 import {
   defaultContent,
@@ -22,7 +23,10 @@ import {
   openContentPreview,
   saveSiteDocument,
   uploadSiteAsset,
+  getAssetRelations,
+  deleteLibraryAsset,
 } from "../data/siteRepository";
+import { contentUsage } from '../../supabase/functions/_shared/assetUsage';
 import "./site-editor.css";
 
 const tabs = [
@@ -118,6 +122,8 @@ export default function SiteEditor({ demo = false }: { demo?: boolean }) {
     [assetsLoaded, setAssetsLoaded] = useState(false),
     [uploading, setUploading] = useState(false),
     [progress, setProgress] = useState(0);
+  const [relations, setRelations] = useState<Record<string, string[]>>({});
+  const [deleting, setDeleting] = useState<string | null>(null);
   const [search, setSearch] = useState(""),
     [publishReview, setPublishReview] = useState(false);
   const [picker, setPicker] = useState<{
@@ -128,6 +134,11 @@ export default function SiteEditor({ demo = false }: { demo?: boolean }) {
   const triggerRef = useRef<HTMLElement | null>(null);
   const pickerRef = useRef<HTMLDivElement>(null);
   const dirty = JSON.stringify(content) !== baseline;
+  useEffect(() => {
+    const changed = () => { void loadAssets(); };
+    window.addEventListener('library-changed', changed);
+    return () => window.removeEventListener('library-changed', changed);
+  }, []);
   useEffect(() => {
     let live = true;
     if (!demo)
@@ -201,11 +212,32 @@ export default function SiteEditor({ demo = false }: { demo?: boolean }) {
       return;
     }
     try {
-      setAssets(await listSiteAssets());
+      const next = await listSiteAssets();
+      const usage = await getAssetRelations(next);
+      setAssets(next);
+      setRelations(usage);
       setAssetsLoaded(true);
     } catch (e) {
       setError((e as Error).message);
     }
+  }
+  async function removeAsset(asset: Asset) {
+    if (demo || deleting) return;
+    setDeleting(asset.url); setError(''); setMessage('');
+    try {
+      const current = await getAssetRelations([asset]);
+      setRelations(previous => ({ ...previous, ...current }));
+      const uses = [...current[asset.url], ...contentUsage(content, asset.url).map(label => `Edición actual · ${label}`)];
+      if (uses.length) {
+        window.alert(`«${asset.name}» está relacionado con:\n\n${uses.join('\n')}\n\nRetíralo de esas secciones y guarda/publica los cambios antes de eliminarlo. En las celebraciones, quítalo de la galería o elimina la celebración conservando sus recursos.`);
+        return;
+      }
+      if (!window.confirm(`¿Eliminar definitivamente «${asset.name}»?\n\nSin relaciones con la web ni con celebraciones. Se borrará de la biblioteca y del almacenamiento. Esta acción no se puede deshacer.`)) return;
+      await deleteLibraryAsset(asset);
+      await loadAssets();
+      setMessage('Recurso eliminado de la biblioteca y del almacenamiento.');
+    } catch (e) { setError((e as Error).message); }
+    finally { setDeleting(null); }
   }
   function choose(label: string, set: (a: Asset | null) => void) {
     triggerRef.current = document.activeElement as HTMLElement;
@@ -415,6 +447,13 @@ export default function SiteEditor({ demo = false }: { demo?: boolean }) {
               <AssetThumb asset={asset} />
               <strong>{asset.name}</strong>
               <small>{asset.type === "video" ? "Video" : "Imagen"}</small>
+              <ul className="asset-relations" aria-label={`Relaciones de ${asset.name}`}>
+                {[...new Set([...(relations[asset.url] ?? ['Relaciones pendientes de comprobar']), ...contentUsage(content, asset.url).map(label => `Edición actual · ${label}`)])].map(label => <li key={label}>{label}</li>)}
+                {relations[asset.url]?.length === 0 && contentUsage(content, asset.url).length === 0 && <li>Sin asignar</li>}
+              </ul>
+              <button type="button" className="admin-button secondary asset-delete" disabled={demo || deleting !== null || uploading} onClick={() => void removeAsset(asset)}>
+                <Trash2 size={14}/>{deleting === asset.url ? 'Comprobando…' : 'Eliminar'}
+              </button>
               {picker && (
                 <button
                   type="button"
@@ -549,7 +588,7 @@ export default function SiteEditor({ demo = false }: { demo?: boolean }) {
               aria-current={tab === t ? "page" : undefined}
               onClick={() => {
                 setTab(t);
-                if (t === "Biblioteca" && !assetsLoaded) void loadAssets();
+                if (t === "Biblioteca") void loadAssets();
               }}
             >
               {t}

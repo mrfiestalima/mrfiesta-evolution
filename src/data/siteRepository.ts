@@ -7,6 +7,29 @@ import {
 } from "./siteContent";
 import type { Json } from "../types/supabase";
 import { uploadToR2 } from "./adminMediaRepository";
+import { assetUsage } from '../../supabase/functions/_shared/assetUsage';
+
+export async function getAssetRelations(assets: Asset[]): Promise<Record<string, string[]>> {
+  const client = requireClient();
+  const [documents, celebrations, media] = await Promise.all([
+    client.from('site_documents').select('kind,content'),
+    client.from('celebrations').select('id,title,published,cover_url,trailer_url'),
+    client.from('media').select('celebration_id,url,thumbnail_url'),
+  ]);
+  if (documents.error || celebrations.error || media.error) throw new Error('No se pudieron comprobar las relaciones de los recursos.');
+  return Object.fromEntries(assets.map(asset => [asset.url, assetUsage(asset.url, documents.data, celebrations.data, media.data, defaultContent.heroAsset?.url ?? '')]));
+}
+
+export async function deleteLibraryAsset(asset: Asset): Promise<void> {
+  const { data, error } = await requireClient().functions.invoke('site-media', { body: { operation: 'delete', url: asset.url } });
+  if (error || !data?.deleted) {
+    let detail = data;
+    if (error && 'context' in error) {
+      try { detail = await error.context.json(); } catch { /* Use safe fallback. */ }
+    }
+    throw new Error(detail?.uses?.length ? `El recurso está en uso: ${detail.uses.join('; ')}. Retíralo de esas secciones y guarda/publica los cambios primero.` : 'No se pudo eliminar el recurso. Recarga la biblioteca e inténtalo de nuevo.');
+  }
+}
 
 export type DocumentState = { content: SiteContent; revision: number };
 const requireClient = () => {
@@ -87,7 +110,7 @@ export async function listSiteAssets(): Promise<Asset[]> {
       type: row.type as Asset["type"],
       name: row.alt || "Archivo de celebración",
     })),
-    ...(defaultContent.heroAsset ? [defaultContent.heroAsset] : []),
+
   ];
   return [...new Map(assets.map((asset) => [asset.url, asset])).values()];
 }

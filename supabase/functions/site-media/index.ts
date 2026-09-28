@@ -3,7 +3,9 @@ import {
   S3Client,
   PutObjectCommand,
   HeadObjectCommand,
+  DeleteObjectCommand,
 } from "npm:@aws-sdk/client-s3@3.859.0";
+import { assetUsage } from '../_shared/assetUsage.ts';
 import { getSignedUrl } from "npm:@aws-sdk/s3-request-presigner@3.859.0";
 
 const cors = {
@@ -43,6 +45,7 @@ Deno.serve(async (req) => {
     const { data: user, error: authError } = await client.auth.getUser(token);
     if (authError || !user.user)
       return response({ error: "Invalid session" }, 401);
+    if (user.user.is_anonymous) return response({ error: "Admin required" }, 403);
     const { data: admin, error: adminError } = await client
       .from("admin_users")
       .select("user_id")
@@ -62,6 +65,32 @@ Deno.serve(async (req) => {
       credentials: { accessKeyId: access, secretAccessKey: secret },
     });
     const body = await req.json();
+    if (body.operation === 'delete' && typeof body.url === 'string') {
+      const url = body.url;
+      if (!url.startsWith(`${base}/`)) return response({ error: 'Invalid asset URL' }, 400);
+      const [assets, media, documents, celebrations] = await Promise.all([
+        client.from('site_assets').select('id,url,object_key').eq('url', url),
+        client.from('media').select('id,celebration_id,url,thumbnail_url'),
+        client.from('site_documents').select('kind,content'),
+        client.from('celebrations').select('id,title,published,cover_url,trailer_url'),
+      ]);
+      if (assets.error || media.error || documents.error || celebrations.error) throw new Error('Could not verify usage');
+      const matching = media.data.filter(m => m.url === url);
+      if (!assets.data.length && !matching.length) return response({ error: 'File not found' }, 404);
+      const uses = assetUsage(url, documents.data, celebrations.data, media.data, `${base}/hero/evolution.mp4`);
+      // Orphaned thumbnails may also belong to a preserved library video.
+      if (media.data.some(m => !m.celebration_id && m.thumbnail_url === url)) uses.push('Miniatura de un video de la biblioteca');
+      if (uses.length) return response({ error: 'ASSET_IN_USE', uses }, 409);
+      const key = decodeURIComponent(url.slice(base.length + 1));
+      if (!key || key.split('/').some(part => part === '..' || part === '.') || key.includes('?') || key.includes('#')) return response({ error: 'Invalid object' }, 400);
+      await r2.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
+      // Keep records until R2 confirms deletion so failed requests are retryable.
+      const deletedMedia = await client.from('media').delete().eq('url', url).is('celebration_id', null);
+      if (deletedMedia.error) throw deletedMedia.error;
+      const deletedAssets = await client.from('site_assets').delete().eq('url', url);
+      if (deletedAssets.error) throw deletedAssets.error;
+      return response({ deleted: true });
+    }
     if (body.operation === "prepare") {
       const { name, contentType, size } = body;
       const image =

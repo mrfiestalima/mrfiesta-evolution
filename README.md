@@ -30,6 +30,10 @@ Los cambios concurrentes en otra sesión producen un conflicto explícito, no un
 
 Las celebraciones siguen disponibles en su propia área. Los controles multimedia no envían accidentalmente el formulario; crear una celebración habilita inmediatamente la subida.
 
+En **Celebraciones → Eliminar**, la confirmación borra la celebración y conserva sus fotos, videos, portada y trailer en la Biblioteca. **Quitar de la celebración** retira la asociación y limpia la portada/trailer si correspondía, conservando el archivo.
+
+La **Biblioteca** muestra las relaciones de cada recurso con el borrador, la web publicada y las celebraciones. **Eliminar** vuelve a comprobar esas relaciones antes de confirmar el borrado definitivo del almacenamiento. Primero hay que retirar las asignaciones y guardar/publicar los cambios. Las ediciones locales sin guardar también bloquean el borrado en esa sesión.
+
 ## Instalación del backend
 
 Consultar [docs/ADMIN_SITE.md](docs/ADMIN_SITE.md). Se requieren las migraciones existentes de celebraciones/admin y las nuevas de contenido, además de la función `site-media`. Reutiliza las mismas credenciales R2 de `r2-media`. Las claves privadas nunca se incluyen en variables `VITE_*`.

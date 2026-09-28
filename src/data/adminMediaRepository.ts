@@ -25,15 +25,9 @@ export async function insertMedia(celebrationId: string, asset: PresignResponse,
 
 export async function cleanupObject(celebrationId: string, key: string): Promise<void> { const client = requireSupabase(); const { error } = await client.functions.invoke('r2-media', { body: { operation: 'cleanup-object', celebrationId, key } }); if (error) throw new Error(error.message) }
 export async function deleteMedia(mediaId: string): Promise<void> {
-  const client = requireSupabase()
-  const [media, documents] = await Promise.all([
-    client.from('media').select('url').eq('id',mediaId).single(),
-    client.from('site_documents').select('content'),
-  ])
-  if (media.error || documents.error) throw new Error('No se pudo comprobar si el archivo está en uso.')
-  if (documents.data?.some(doc=>JSON.stringify(doc.content).includes(media.data.url))) throw new Error('Este archivo está en uso en el contenido de la web. Retíralo del borrador y de la versión publicada antes de eliminarlo.')
-  const { error } = await client.functions.invoke('r2-media', { body: { operation: 'delete-media', mediaId } })
-  if (error) throw new Error(error.message)
+  const { error } = await requireSupabase().rpc('detach_celebration_media', { target_id: mediaId })
+  if (error) throw new Error('No se pudo quitar el recurso de la celebración.')
+  window.dispatchEvent(new Event('library-changed'))
 }
 export async function updateMediaOrder(mediaId: string, sortOrder: number): Promise<void> { const client = requireSupabase(); const { error } = await client.from('media').update({ sort_order: sortOrder }).eq('id', mediaId); if (error) throw new Error(error.message) }
 export async function setCelebrationCover(celebrationId: string, url: string): Promise<void> { const client = requireSupabase(); const { error } = await client.from('celebrations').update({ cover_url: url }).eq('id', celebrationId); if (error) throw new Error(error.message) }

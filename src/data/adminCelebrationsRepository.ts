@@ -68,3 +68,8 @@ export async function signOutAdmin(): Promise<void> {
   const { error } = await client.auth.signOut()
   if (error) throw new Error(error.message)
 }
+
+export async function deleteCelebration(id: string): Promise<void> {
+  const { error } = await requireSupabase().rpc('delete_celebration_keep_media', { target_id: id })
+  if (error) throw new Error('No se pudo eliminar la celebración. Sus archivos se conservan; inténtalo de nuevo.')
+}

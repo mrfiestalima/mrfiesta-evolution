@@ -85,7 +85,7 @@ export type Database = {
       media: {
         Row: {
           id: string;
-          celebration_id: string;
+          celebration_id: string | null;
           type: string;
           url: string;
           thumbnail_url: string | null;
@@ -114,6 +114,8 @@ export type Database = {
     };
     Views: Record<string, never>;
     Functions: {
+      detach_celebration_media: { Args: { target_id: string }; Returns: undefined };
+      delete_celebration_keep_media: { Args: { target_id: string }; Returns: undefined };
       save_site_document: {
         Args: { target_kind: string; payload: Json; expected_revision: number };
         Returns: Database["public"]["Tables"]["site_documents"]["Row"][];

@@ -1,6 +1,6 @@
 export type CelebrationMedia = {
   id: string
-  celebrationId: string
+  celebrationId: string | null
   type: 'image' | 'video'
   url: string
   thumbnailUrl: string | null

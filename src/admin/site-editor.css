@@ -361,3 +361,5 @@
   outline: 2px solid #eaff54;
   outline-offset: 2px;
 }
+
+.asset-relations{padding-left:16px;margin:8px 0;font-size:11px;line-height:1.5;color:#b6c2cc;overflow-wrap:anywhere}.cms-library .asset-delete{color:#ffaaaa;border-color:#633b40}
