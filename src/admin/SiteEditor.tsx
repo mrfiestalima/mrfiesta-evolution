@@ -1,3 +1,5 @@
+import { profiles } from "../data/recommendationRules";
+import EvolutionEditor, { RecordFields } from "./EvolutionEditor";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowDown,
@@ -26,7 +28,7 @@ import {
   getAssetRelations,
   deleteLibraryAsset,
 } from "../data/siteRepository";
-import { contentUsage } from '../../supabase/functions/_shared/assetUsage';
+import { contentUsage } from "../../supabase/functions/_shared/assetUsage";
 import "./site-editor.css";
 
 const tabs = [
@@ -37,6 +39,7 @@ const tabs = [
   "Textos y secciones",
   "Contacto",
   "Biblioteca",
+  "Evolution 2",
 ] as const;
 type Tab = (typeof tabs)[number];
 const copyLabels: Record<string, string> = {
@@ -135,9 +138,11 @@ export default function SiteEditor({ demo = false }: { demo?: boolean }) {
   const pickerRef = useRef<HTMLDivElement>(null);
   const dirty = JSON.stringify(content) !== baseline;
   useEffect(() => {
-    const changed = () => { void loadAssets(); };
-    window.addEventListener('library-changed', changed);
-    return () => window.removeEventListener('library-changed', changed);
+    const changed = () => {
+      void loadAssets();
+    };
+    window.addEventListener("library-changed", changed);
+    return () => window.removeEventListener("library-changed", changed);
   }, []);
   useEffect(() => {
     let live = true;
@@ -223,21 +228,38 @@ export default function SiteEditor({ demo = false }: { demo?: boolean }) {
   }
   async function removeAsset(asset: Asset) {
     if (demo || deleting) return;
-    setDeleting(asset.url); setError(''); setMessage('');
+    setDeleting(asset.url);
+    setError("");
+    setMessage("");
     try {
       const current = await getAssetRelations([asset]);
-      setRelations(previous => ({ ...previous, ...current }));
-      const uses = [...current[asset.url], ...contentUsage(content, asset.url).map(label => `Edición actual · ${label}`)];
+      setRelations((previous) => ({ ...previous, ...current }));
+      const uses = [
+        ...current[asset.url],
+        ...contentUsage(content, asset.url).map(
+          (label) => `Edición actual · ${label}`,
+        ),
+      ];
       if (uses.length) {
-        window.alert(`«${asset.name}» está relacionado con:\n\n${uses.join('\n')}\n\nRetíralo de esas secciones y guarda/publica los cambios antes de eliminarlo. En las celebraciones, quítalo de la galería o elimina la celebración conservando sus recursos.`);
+        window.alert(
+          `«${asset.name}» está relacionado con:\n\n${uses.join("\n")}\n\nRetíralo de esas secciones y guarda/publica los cambios antes de eliminarlo. En las celebraciones, quítalo de la galería o elimina la celebración conservando sus recursos.`,
+        );
         return;
       }
-      if (!window.confirm(`¿Eliminar definitivamente «${asset.name}»?\n\nSin relaciones con la web ni con celebraciones. Se borrará de la biblioteca y del almacenamiento. Esta acción no se puede deshacer.`)) return;
+      if (
+        !window.confirm(
+          `¿Eliminar definitivamente «${asset.name}»?\n\nSin relaciones con la web ni con celebraciones. Se borrará de la biblioteca y del almacenamiento. Esta acción no se puede deshacer.`,
+        )
+      )
+        return;
       await deleteLibraryAsset(asset);
       await loadAssets();
-      setMessage('Recurso eliminado de la biblioteca y del almacenamiento.');
-    } catch (e) { setError((e as Error).message); }
-    finally { setDeleting(null); }
+      setMessage("Recurso eliminado de la biblioteca y del almacenamiento.");
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setDeleting(null);
+    }
   }
   function choose(label: string, set: (a: Asset | null) => void) {
     triggerRef.current = document.activeElement as HTMLElement;
@@ -289,7 +311,7 @@ export default function SiteEditor({ demo = false }: { demo?: boolean }) {
       setMessage(
         kind === "draft"
           ? "Borrador guardado. La web pública sigue igual."
-          : "Cambios publicados. Se verán al abrir o recargar la web.",
+          : "Contenido publicado. Regenera el sitio para actualizar HTML, nuevas rutas y sitemap.",
       );
     } catch (e) {
       setError((e as Error).message);
@@ -422,10 +444,11 @@ export default function SiteEditor({ demo = false }: { demo?: boolean }) {
         </button>
       </div>
       <p className="cms-help">
-        Recomendado: fotos y videos verticales de 1080 × 1920 px (9:16).
-        También puedes subir horizontales; se muestran completos, sin recortar.
-        Para video, usa MP4 con H.264 y audio AAC. No necesitas convertir tus
-        grabaciones verticales a horizontal. </p>
+        Recomendado: fotos y videos verticales de 1080 × 1920 px (9:16). También
+        puedes subir horizontales; se muestran completos, sin recortar. Para
+        video, usa MP4 con H.264 y audio AAC. No necesitas convertir tus
+        grabaciones verticales a horizontal.{" "}
+      </p>
       <p className="cms-help">
         JPG, PNG y WebP hasta 20 MB · MP4 y WebM hasta 500 MB. Los archivos se
         guardan en Cloudflare y quedan disponibles mediante su enlace. Solo
@@ -447,12 +470,35 @@ export default function SiteEditor({ demo = false }: { demo?: boolean }) {
               <AssetThumb asset={asset} />
               <strong>{asset.name}</strong>
               <small>{asset.type === "video" ? "Video" : "Imagen"}</small>
-              <ul className="asset-relations" aria-label={`Relaciones de ${asset.name}`}>
-                {[...new Set([...(relations[asset.url] ?? ['Relaciones pendientes de comprobar']), ...contentUsage(content, asset.url).map(label => `Edición actual · ${label}`)])].map(label => <li key={label}>{label}</li>)}
-                {relations[asset.url]?.length === 0 && contentUsage(content, asset.url).length === 0 && <li>Sin asignar</li>}
+              <ul
+                className="asset-relations"
+                aria-label={`Relaciones de ${asset.name}`}
+              >
+                {[
+                  ...new Set([
+                    ...(relations[asset.url] ?? [
+                      "Relaciones pendientes de comprobar",
+                    ]),
+                    ...contentUsage(content, asset.url).map(
+                      (label) => `Edición actual · ${label}`,
+                    ),
+                  ]),
+                ].map((label) => (
+                  <li key={label}>{label}</li>
+                ))}
+                {relations[asset.url]?.length === 0 &&
+                  contentUsage(content, asset.url).length === 0 && (
+                    <li>Sin asignar</li>
+                  )}
               </ul>
-              <button type="button" className="admin-button secondary asset-delete" disabled={demo || deleting !== null || uploading} onClick={() => void removeAsset(asset)}>
-                <Trash2 size={14}/>{deleting === asset.url ? 'Comprobando…' : 'Eliminar'}
+              <button
+                type="button"
+                className="admin-button secondary asset-delete"
+                disabled={demo || deleting !== null || uploading}
+                onClick={() => void removeAsset(asset)}
+              >
+                <Trash2 size={14} />
+                {deleting === asset.url ? "Comprobando…" : "Eliminar"}
               </button>
               {picker && (
                 <button
@@ -687,6 +733,41 @@ export default function SiteEditor({ demo = false }: { demo?: boolean }) {
                         })
                       }
                     />
+                    <RecordFields
+                      record={{
+                        slug: item.slug ?? item.id,
+                        subtitle: item.subtitle ?? "",
+                        included: item.included ?? item.tags,
+                        ages: item.ages ?? profiles[item.id]?.ages ?? [],
+                        guests: item.guests ?? null,
+                        preferences:
+                          item.preferences ??
+                          profiles[item.id]?.preferences ??
+                          [],
+                        image: item.image ?? null,
+                        video: item.video ?? null,
+                        cta: item.cta ?? "QUIERO ESTA EXPERIENCIA",
+                        featured: item.featured ?? false,
+                      }}
+                      slot={slot}
+                      onChange={(fields) =>
+                        change({
+                          ...content,
+                          experiences: content.experiences.map((x) =>
+                            x.id === item.id
+                              ? {
+                                  ...x,
+                                  ...fields,
+                                  guests:
+                                    fields.guests === null
+                                      ? undefined
+                                      : Number(fields.guests),
+                                }
+                              : x,
+                          ),
+                        })
+                      }
+                    />
                     {slot(`Archivo de ${item.name}`, item.asset, (a) =>
                       change({
                         ...content,
@@ -767,6 +848,22 @@ export default function SiteEditor({ demo = false }: { demo?: boolean }) {
                           ...content,
                           technology: content.technology.map((i) =>
                             i.id === item.id ? { ...i, name: value } : i,
+                          ),
+                        })
+                      }
+                    />
+                    <RecordFields
+                      record={{
+                        slug: item.slug ?? item.id,
+                        description: item.description ?? "",
+                        eventIds: item.eventIds ?? [],
+                        cta: item.cta ?? "CONSULTAR",
+                      }}
+                      onChange={(fields) =>
+                        change({
+                          ...content,
+                          technology: content.technology.map((x) =>
+                            x.id === item.id ? { ...x, ...fields } : x,
                           ),
                         })
                       }
@@ -972,6 +1069,21 @@ export default function SiteEditor({ demo = false }: { demo?: boolean }) {
                 />
               ))}
             </>
+          )}
+          <p className="cms-hint">
+            Tras publicar páginas o eventos,{" "}
+            <a
+              href="https://github.com/mrfiestalima/mrfiesta-evolution/actions/workflows/deploy.yml"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              regenera el sitio en GitHub → Run workflow
+            </a>
+            . El contenido dinámico se actualiza al recargar; el HTML y sitemap
+            se actualizan al finalizar el despliegue.
+          </p>
+          {tab === "Evolution 2" && (
+            <EvolutionEditor content={content} onChange={change} slot={slot} />
           )}
           {tab === "Biblioteca" && library}
         </div>

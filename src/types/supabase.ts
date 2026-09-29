@@ -58,6 +58,7 @@ export type Database = {
       };
       celebrations: {
         Row: {
+          details: Json;
           id: string;
           slug: string;
           child_name: string;
@@ -77,7 +78,9 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
-          [K in keyof Database["public"]["Tables"]["celebrations"]["Row"]]?: Database["public"]["Tables"]["celebrations"]["Row"][K];
+          [
+            K in keyof Database["public"]["Tables"]["celebrations"]["Row"]
+          ]?: Database["public"]["Tables"]["celebrations"]["Row"][K];
         };
         Update: Partial<Database["public"]["Tables"]["celebrations"]["Insert"]>;
         Relationships: [];
@@ -98,7 +101,9 @@ export type Database = {
           created_at: string;
         };
         Insert: {
-          [K in keyof Database["public"]["Tables"]["media"]["Row"]]?: Database["public"]["Tables"]["media"]["Row"][K];
+          [
+            K in keyof Database["public"]["Tables"]["media"]["Row"]
+          ]?: Database["public"]["Tables"]["media"]["Row"][K];
         };
         Update: Partial<Database["public"]["Tables"]["media"]["Insert"]>;
         Relationships: [
@@ -114,8 +119,14 @@ export type Database = {
     };
     Views: Record<string, never>;
     Functions: {
-      detach_celebration_media: { Args: { target_id: string }; Returns: undefined };
-      delete_celebration_keep_media: { Args: { target_id: string }; Returns: undefined };
+      detach_celebration_media: {
+        Args: { target_id: string };
+        Returns: undefined;
+      };
+      delete_celebration_keep_media: {
+        Args: { target_id: string };
+        Returns: undefined;
+      };
       save_site_document: {
         Args: { target_kind: string; payload: Json; expected_revision: number };
         Returns: Database["public"]["Tables"]["site_documents"]["Row"][];

@@ -1,3 +1,6 @@
+import { technologyDetails } from "./technology";
+import { evolutionDefaults, validateEvolution } from "./evolution";
+import type { EvolutionContent } from "../types/evolution";
 import { mediaManifest } from "./media";
 
 export type Asset = {
@@ -7,6 +10,17 @@ export type Asset = {
   name: string;
 };
 export type Experience = {
+  slug?: string;
+  subtitle?: string;
+  included?: string[];
+  ages?: string[];
+  guests?: number;
+  preferences?: string[];
+  image?: Asset | null;
+  video?: Asset | null;
+  cta?: string;
+  featured?: boolean;
+
   id: string;
   name: string;
   price: string;
@@ -17,6 +31,11 @@ export type Experience = {
   asset: Asset | null;
 };
 export type Technology = {
+  slug?: string;
+  description?: string;
+  eventIds?: string[];
+  cta?: string;
+
   id: string;
   name: string;
   enabled: boolean;
@@ -43,8 +62,8 @@ export const copyDefaults = {
   liveDescription:
     "Una capa digital que convierte a los invitados en parte activa del show. Piden canciones, comparten fotos, reaccionan y se conectan con el DJ.",
   liveButton: "Conocer MR Fiesta Live",
-  eventsTitle: "CELEBRACIONES",
-  eventsAccent: "PARA RECORDAR.",
+  eventsTitle: "EVENTOS REALES",
+  eventsAccent: "ASÍ SE VIVE MR FIESTA.",
   eventsDescription: "Música, luz y momentos para compartir.",
   proofTitle: "Tú pones el motivo.",
   proofAccent: "Juntos creamos la celebración.",
@@ -75,6 +94,7 @@ export const sectionLabels = {
 };
 export type SectionKey = keyof typeof sectionLabels;
 export type SiteContent = {
+  evolution?: EvolutionContent;
   version: 1;
   copy: typeof copyDefaults;
   visible: Record<SectionKey, boolean>;
@@ -92,6 +112,7 @@ export type SiteContent = {
   };
 };
 export const defaultContent: SiteContent = {
+  evolution: evolutionDefaults,
   version: 1,
   copy: copyDefaults,
   visible: Object.fromEntries(
@@ -147,6 +168,32 @@ export const defaultContent: SiteContent = {
       enabled: true,
       asset: null,
     },
+    {
+      id: "chicoteca",
+      slug: "chicoteca",
+      name: "Chicoteca",
+      price: "S/590",
+      time: "",
+      desc: "Formato sin animación para disfrutar la música y el baile. Consulta los incluidos para tu evento.",
+      tags: ["Sin animación", "Baile", "Karaoke"],
+      preferences: ["Bailar", "Karaoke"],
+      ages: ["12-14", "15-17", "Adultos"],
+      enabled: true,
+      asset: null,
+    },
+    {
+      id: "club-led",
+      slug: "club-led",
+      name: "Club LED",
+      price: "S/1090",
+      time: "",
+      desc: "Formato sin animación con pista LED. Revisamos espacio y requerimientos antes de confirmar la propuesta.",
+      tags: ["Sin animación", "Pista LED"],
+      preferences: ["Bailar", "Pista LED"],
+      ages: ["12-14", "15-17", "Adultos"],
+      enabled: true,
+      asset: null,
+    },
   ],
   technology: [
     "Pista LED Infinity",
@@ -156,7 +203,13 @@ export const defaultContent: SiteContent = {
     "Proyección audiovisual",
     "Robot LED",
     "Glitter & Neon",
-  ].map((name, i) => ({ id: `tech-${i}`, name, enabled: true, asset: null })),
+  ].map((name, i) => ({
+    id: `tech-${i}`,
+    name,
+    enabled: true,
+    asset: null,
+    ...technologyDetails[i],
+  })),
   facts: [
     {
       id: "production",
@@ -180,6 +233,42 @@ export const defaultContent: SiteContent = {
     },
   ],
   faq: [
+    {
+      id: "coverage",
+      question: "¿Atienden toda Lima y provincia?",
+      answer:
+        "Cuéntanos el distrito o ciudad. La cobertura, movilidad y condiciones se confirman en la propuesta según la fecha y el servicio.",
+    },
+    {
+      id: "apartment",
+      question: "¿Pueden instalar en departamentos? ¿Necesitan ascensor?",
+      answer:
+        "Revisamos fotos o un video del espacio y el recorrido de acceso. Indica el piso, ascensor, escaleras y medidas de puertas para evaluar el montaje.",
+    },
+    {
+      id: "led-space",
+      question: "¿Cuánto espacio requiere una pista LED?",
+      answer:
+        "Depende de la configuración y de las zonas de circulación. Envía medidas y fotos para revisar qué montaje resulta viable.",
+    },
+    {
+      id: "setup",
+      question: "¿Cuánto demora la instalación?",
+      answer:
+        "El tiempo depende del equipo, acceso y espacio. Coordinamos la llegada y el montaje al confirmar la propuesta.",
+    },
+    {
+      id: "dj-decoration",
+      question: "¿Puedo contratar DJ o agregar decoración?",
+      answer:
+        "Indica qué servicios necesitas y el tipo de evento. Revisamos opciones, incluidos y disponibilidad para preparar una propuesta.",
+    },
+    {
+      id: "teens",
+      question: "¿Trabajan con adolescentes?",
+      answer:
+        "Puedes comparar los formatos de música, karaoke y pista LED. La elección de animación y actividades se adapta a las preferencias del grupo.",
+    },
     {
       id: "quote",
       question: "¿Cómo solicito una cotización?",
@@ -309,5 +398,68 @@ export function validateContent(value: unknown): SiteContent {
     !c.faq.every((i) => text(i.question, 300) && text(i.answer))
   )
     return fail("Revisa las preguntas frecuentes.");
+  if (c.evolution) validateEvolution(c.evolution);
+  if (new TextEncoder().encode(JSON.stringify(c)).length > 262144)
+    return fail(
+      "El contenido supera el límite de 256 KB. Reduce textos o elementos.",
+    );
+  const slug = (v: unknown) =>
+    v === undefined ||
+    (typeof v === "string" && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(v));
+  for (const x of c.experiences) {
+    if (
+      !slug(x.slug || x.id) ||
+      (x.guests !== undefined &&
+        (!Number.isInteger(x.guests) || x.guests < 1)) ||
+      [x.included, x.ages, x.preferences].some(
+        (v) =>
+          v !== undefined &&
+          (!Array.isArray(v) || v.length > 30 || v.some((t) => !text(t, 300))),
+      ) ||
+      (x.image !== undefined && !asset(x.image)) ||
+      (x.video !== undefined && !asset(x.video)) ||
+      (x.subtitle !== undefined && !text(x.subtitle, 300)) ||
+      (x.cta !== undefined && !text(x.cta, 120)) ||
+      (x.featured !== undefined && typeof x.featured !== "boolean")
+    )
+      return fail("Revisa los detalles de las experiencias.");
+  }
+  if (
+    c.technology.some(
+      (x) =>
+        !slug(x.slug || x.id) ||
+        (x.description !== undefined && !text(x.description)) ||
+        (x.cta !== undefined && !text(x.cta, 120)) ||
+        (x.eventIds !== undefined &&
+          (!Array.isArray(x.eventIds) ||
+            x.eventIds.some((id) => !text(id, 100)))),
+    )
+  )
+    return fail("Revisa tecnología.");
+  for (const list of [c.experiences, c.technology]) {
+    const slugs = list.map((x) => x.slug || x.id);
+    if (new Set(slugs).size !== slugs.length)
+      return fail("Hay slugs duplicados.");
+  }
   return c;
+}
+
+export function upgradeContent(c: SiteContent): SiteContent {
+  if (c.evolution) return c;
+  return {
+    ...c,
+    evolution: structuredClone(evolutionDefaults),
+    technology: c.technology.map((x) => ({
+      ...technologyDetails[Number(x.id.replace("tech-", ""))],
+      ...x,
+    })),
+    experiences: [
+      ...c.experiences,
+      ...defaultContent.experiences.filter(
+        (x) =>
+          ["chicoteca", "club-led"].includes(x.id) &&
+          !c.experiences.some((old) => old.id === x.id),
+      ),
+    ],
+  };
 }

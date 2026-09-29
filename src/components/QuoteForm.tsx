@@ -1,3 +1,5 @@
+import { messages } from "../lib/whatsapp";
+import { trackEvent } from "../lib/analytics";
 import { useState, type FormEvent } from "react";
 import { ArrowUpRight, Check } from "lucide-react";
 import { useWhatsAppUrl } from "./ContactContext";
@@ -22,9 +24,17 @@ export function QuoteForm({
     const date = value("date")
       ? value("date").split("-").reverse().join("/")
       : "Por definir";
+    trackEvent("quote_complete");
     setPrepared(
       whatsappUrl(
-        `Hola 👋 Quiero cotizar mi fiesta con MR FIESTA.\n\nExperiencia: ${value("experience")}\nFecha: ${date}\nDistrito: ${value("district")}\nEdad: ${value("age") || "Por definir"}\nInvitados: ${value("guests") || "Por definir"}\n${value("details") ? `Detalles: ${value("details")}\n` : ""}\n¿Me ayudan a revisar disponibilidad y preparar una propuesta?`,
+        messages.quoteDetails({
+          Experiencia: value("experience"),
+          Fecha: date,
+          Distrito: value("district"),
+          Edad: value("age") || "Por definir",
+          Invitados: value("guests") || "Por definir",
+          Detalles: value("details"),
+        }),
       ),
     );
   }

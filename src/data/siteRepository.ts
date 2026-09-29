@@ -2,32 +2,59 @@ import { supabase } from "../lib/supabase";
 import {
   defaultContent,
   validateContent,
+  upgradeContent,
   type SiteContent,
   type Asset,
 } from "./siteContent";
 import type { Json } from "../types/supabase";
 import { uploadToR2 } from "./adminMediaRepository";
-import { assetUsage } from '../../supabase/functions/_shared/assetUsage';
+import { assetUsage } from "../../supabase/functions/_shared/assetUsage";
 
-export async function getAssetRelations(assets: Asset[]): Promise<Record<string, string[]>> {
+export async function getAssetRelations(
+  assets: Asset[],
+): Promise<Record<string, string[]>> {
   const client = requireClient();
   const [documents, celebrations, media] = await Promise.all([
-    client.from('site_documents').select('kind,content'),
-    client.from('celebrations').select('id,title,published,cover_url,trailer_url'),
-    client.from('media').select('celebration_id,url,thumbnail_url'),
+    client.from("site_documents").select("kind,content"),
+    client
+      .from("celebrations")
+      .select("id,title,published,cover_url,trailer_url"),
+    client.from("media").select("celebration_id,url,thumbnail_url"),
   ]);
-  if (documents.error || celebrations.error || media.error) throw new Error('No se pudieron comprobar las relaciones de los recursos.');
-  return Object.fromEntries(assets.map(asset => [asset.url, assetUsage(asset.url, documents.data, celebrations.data, media.data, defaultContent.heroAsset?.url ?? '')]));
+  if (documents.error || celebrations.error || media.error)
+    throw new Error("No se pudieron comprobar las relaciones de los recursos.");
+  return Object.fromEntries(
+    assets.map((asset) => [
+      asset.url,
+      assetUsage(
+        asset.url,
+        documents.data,
+        celebrations.data,
+        media.data,
+        defaultContent.heroAsset?.url ?? "",
+      ),
+    ]),
+  );
 }
 
 export async function deleteLibraryAsset(asset: Asset): Promise<void> {
-  const { data, error } = await requireClient().functions.invoke('site-media', { body: { operation: 'delete', url: asset.url } });
+  const { data, error } = await requireClient().functions.invoke("site-media", {
+    body: { operation: "delete", url: asset.url },
+  });
   if (error || !data?.deleted) {
     let detail = data;
-    if (error && 'context' in error) {
-      try { detail = await error.context.json(); } catch { /* Use safe fallback. */ }
+    if (error && "context" in error) {
+      try {
+        detail = await error.context.json();
+      } catch {
+        /* Use safe fallback. */
+      }
     }
-    throw new Error(detail?.uses?.length ? `El recurso está en uso: ${detail.uses.join('; ')}. Retíralo de esas secciones y guarda/publica los cambios primero.` : 'No se pudo eliminar el recurso. Recarga la biblioteca e inténtalo de nuevo.');
+    throw new Error(
+      detail?.uses?.length
+        ? `El recurso está en uso: ${detail.uses.join("; ")}. Retíralo de esas secciones y guarda/publica los cambios primero.`
+        : "No se pudo eliminar el recurso. Recarga la biblioteca e inténtalo de nuevo.",
+    );
   }
 }
 
@@ -39,7 +66,7 @@ const requireClient = () => {
 };
 const decode = (data: Json) =>
   Object.keys(data as object).length
-    ? validateContent(data)
+    ? upgradeContent(validateContent(data))
     : structuredClone(defaultContent);
 export async function getSiteDocument(
   kind: "draft" | "published",
@@ -110,7 +137,6 @@ export async function listSiteAssets(): Promise<Asset[]> {
       type: row.type as Asset["type"],
       name: row.alt || "Archivo de celebración",
     })),
-
   ];
   return [...new Map(assets.map((asset) => [asset.url, asset])).values()];
 }
@@ -167,13 +193,16 @@ export function openContentPreview(content: SiteContent) {
   );
 }
 export function readContentPreview(): SiteContent | null {
+  if (typeof location === "undefined") return null;
   const id = new URLSearchParams(location.search).get("preview");
   if (!id || !/^[a-f0-9-]{36}$/.test(id)) return null;
   try {
     const item = JSON.parse(
       localStorage.getItem(`mrfiesta-preview-${id}`) ?? "null",
     );
-    return item?.expires > Date.now() ? validateContent(item.content) : null;
+    return item?.expires > Date.now()
+      ? upgradeContent(validateContent(item.content))
+      : null;
   } catch {
     return null;
   }

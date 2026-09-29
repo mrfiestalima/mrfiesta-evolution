@@ -362,4 +362,32 @@
   outline-offset: 2px;
 }
 
-.asset-relations{padding-left:16px;margin:8px 0;font-size:11px;line-height:1.5;color:#b6c2cc;overflow-wrap:anywhere}.cms-library .asset-delete{color:#ffaaaa;border-color:#633b40}
+.asset-relations {
+  padding-left: 16px;
+  margin: 8px 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #b6c2cc;
+  overflow-wrap: anywhere;
+}
+.cms-library .asset-delete {
+  color: #ffaaaa;
+  border-color: #633b40;
+}
+
+.cms-card > summary {
+  cursor: pointer;
+  font-size: 1.15rem;
+  padding: 0.7rem 0;
+  color: #eaff45;
+}
+.cms-fields select {
+  padding: 0.8rem;
+  background: #080e14;
+  color: white;
+  border: 1px solid #53616c;
+  width: 100%;
+}
+.cms-fields .cms-card {
+  margin-top: 1rem;
+}
