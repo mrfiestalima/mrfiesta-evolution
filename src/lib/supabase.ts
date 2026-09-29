@@ -6,5 +6,7 @@ const publishableKey = import.meta.env?.VITE_SUPABASE_PUBLISHABLE_KEY as
   string | undefined;
 
 export const supabase: SupabaseClient<Database> | null =
-  url && publishableKey ? createClient<Database>(url, publishableKey) : null;
+  url && publishableKey && !import.meta.env?.SSR
+    ? createClient<Database>(url, publishableKey)
+    : null;
 export const isSupabaseConfigured = Boolean(supabase);

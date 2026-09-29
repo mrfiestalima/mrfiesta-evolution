@@ -60,10 +60,13 @@ export default function App({ initial }: { initial?: Bootstrap }) {
       document.head.append(tag);
       return () => tag.remove();
     }
+  }, [page.kind, page.path, preview, content]);
+  useEffect(() => {
+    if (preview) return;
     if (page.kind === "experience")
       trackEvent("experience_view", { id: page.item.id });
     if (page.kind === "event") trackEvent("event_view", { id: page.item.id });
-  }, [page.kind, page.path, preview, content]);
+  }, [page.kind, page.path, preview]);
   return page.kind === "home" ? (
     <HomePage content={content} celebrations={events} preview={!!preview} />
   ) : (

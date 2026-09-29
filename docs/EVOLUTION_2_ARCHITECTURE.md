@@ -87,6 +87,8 @@ En Adicionales, ingresar nombre, descripción, precio, imagen, modalidad y IDs c
 
 ## Validación y despliegue
 
+Usar Node 22.12 o superior (GitHub Actions usa Node 22).
+
 1. `npm ci`
 2. `npm test`
 3. `npm run lint`

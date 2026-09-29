@@ -1,6 +1,6 @@
 import { messages } from "../lib/whatsapp";
 import { trackEvent } from "../lib/analytics";
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { ArrowUpRight, Check } from "lucide-react";
 import { useWhatsAppUrl } from "./ContactContext";
 import { copyDefaults } from "../data/siteContent";
@@ -14,9 +14,14 @@ export function QuoteForm({
 }) {
   const whatsappUrl = useWhatsAppUrl();
   const [prepared, setPrepared] = useState<string | null>(null);
-  const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-    .toISOString()
-    .slice(0, 10);
+  const [today, setToday] = useState("");
+  useEffect(() => {
+    setToday(
+      new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 10),
+    );
+  }, []);
   function prepare(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
