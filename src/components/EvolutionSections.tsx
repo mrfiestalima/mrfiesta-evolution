@@ -75,9 +75,7 @@ export function EvolutionIntro({ content }: { content: SiteContent }) {
   const e = content.evolution ?? evolutionDefaults;
   const stats = e.stats.filter((x) => x.enabled && x.value && x.label);
   const slugs = [
-    "fiestas-infantiles-lima",
-    "fiestas-preadolescentes-lima",
-    "fiestas-adolescentes-lima",
+    "chicoteca-lima",
     "fiestas-15-anos-lima",
     "fiestas-adultos-lima",
     "eventos-colegios-lima",
@@ -106,7 +104,7 @@ export function EvolutionIntro({ content }: { content: SiteContent }) {
             .filter((x) => x.enabled && slugs.includes(x.slug))
             .map((x) => (
               <a className="evo-card" key={x.id} href={sitePath(`${x.slug}/`)}>
-                <h3>{x.title}</h3>
+                <h3>{x.slug === "chicoteca-lima" ? "CHICOTECAS EN LIMA" : x.title}</h3>
                 <p>{x.description}</p>
                 <span>Descubrir →</span>
               </a>
